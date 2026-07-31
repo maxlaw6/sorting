@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wallace Stegner Academy House Sorting Ceremony</title>
+    <!-- Google Fonts for Modern Styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #07090f;
+            --surface: rgba(15, 20, 35, 0.85);
+            --border-glow: rgba(217, 119, 6, 0.5);
+            --primary: #d97706;
+            --primary-hover: #b45309;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        /* 3D Scrolling Castle Wall Background using Canvas */
+        #castle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* RCA Style Top Banner Bar */
+        .rca-top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #3b82f6, #ef4444, #10b981, #374151, #06b6d4, #a855f7);
+            z-index: 1000;
+        }
+
+        /* Main Quiz Wrapper with Enhanced 3D Glassmorphism, Animated Glow & Depth Layers */
+        .quiz-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 720px;
+            background: linear-gradient(145deg, rgba(18, 24, 43, 0.9), rgba(8, 12, 21, 0.95));
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border-radius: 28px;
+            padding: 42px;
+            box-shadow: 
+                0 40px 100px rgba(0, 0, 0, 0.95), 
+                inset 0 2px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -20px 40px rgba(0, 0, 0, 0.8);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            margin: 40px 15px;
+            transform-style: preserve-3d;
+            perspective: 1200px;
+        }
+
+        @media(max-width: 768px) {
+            .quiz-wrapper {
+                padding: 24px;
+                margin: 20px 10px;
+                border-radius: 20px;
+            }
+        }
+
+        /* Animated Magical Border */
+        .quiz-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #d97706, transparent, #3b82f6, transparent, #10b981, transparent, #a855f7);
+            background-size: 400% 400%;
+            border-radius: 30px;
+            z-index: -1;
+            animation: glowingBorder 12s ease infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes glowingBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1, h2, .house-title {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .quiz-header::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 80px;
+            background: radial-gradient(ellipse at center, rgba(217, 119, 6, 0.25) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+            animation: pulseHeader 4s infinite alternate;
+        }
+
+        @keyframes pulseHeader {
+            from { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .quiz-header h1 {
+            font-size: 2.4rem;
+            margin: 0 0 10px 0;
+            background: linear-gradient(135deg, #fff 30%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 25px rgba(217, 119, 6, 0.5);
+        }
+
+        @media(max-width: 768px) {
+            .quiz-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .quiz-header p {
+            color: #fbbf24;
+            font-size: 0.95rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 800;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #d97706, #f59e0b, #fbbf24);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+        }
+
+        #name-screen {
+            text-align: center;
+        }
+
+        .name-input-field {
+            width: 100%;
+            background: rgba(5, 7, 12, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 20px 0;
+            outline: none;
+            transition: all 0.3s;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.6);
+            font-family: 'Cinzel', serif;
+        }
+
+        .name-input-field:focus {
+            border-color: #fbbf24;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 25px rgba(245, 158, 11, 0.4);
+            background: rgba(10, 15, 25, 0.9);
+        }
+
+        .question-block {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .question-block.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #fff;
+            line-height: 1.4;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.8);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media(max-width: 768px) {
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        @media(max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .option-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(217, 119, 6, 0.6);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 20px rgba(217, 119, 6, 0.2);
+        }
+
+        .option-label input[type="radio"] {
+            display: none;
+        }
+
+        .option-label.selected {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.35), rgba(245, 158, 11, 0.15));
+            border-color: #fbbf24;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(217, 119, 6, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-badge {
+            background: linear-gradient(135deg, #111, #333);
+            border: 1px solid #d97706;
+            color: #fbbf24;
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+        }
+
+        .option-label.selected .option-badge {
+            background: #d97706;
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .option-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #f3f4f6;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #d97706, #92400e);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(217, 119, 6, 0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+            font-family: 'Cinzel', serif;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(217, 119, 6, 0.7), inset 0 1px 0 rgba(255,255,255,0.6);
+            background: linear-gradient(135deg, #f59e0b, #b45309);
+        }
+
+        .action-btn:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.2);
+            border-color: transparent;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .secondary-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #d1d5db;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* Results Screen & Modern 3D Rendered Shield Styling */
+        #result-screen {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .welcome-candidate {
+            font-size: 1.1rem;
+            color: #d1d5db;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            font-weight: 500;
+        }
+
+        .house-title {
+            font-size: 3rem;
+            margin: 15px 0 20px 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-shadow: 0 8px 25px rgba(0,0,0,0.9), 0 0 20px rgba(217, 119, 6, 0.4);
+        }
+
+        @media(max-width: 768px) {
+            .house-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* 3D Modern Clean Shield Container with Interactive Floating Motion */
+        .crest-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0; 
+            transform: translateY(40px) scale(0.6);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 10px auto 25px auto;
+            perspective: 1000px;
+        }
+
+        .crest-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .shield-3d-scene {
+            width: 150px;
+            height: 180px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: modernFloat 4s ease-in-out infinite alternate;
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.8));
+        }
+
+        @keyframes modernFloat {
+            0% { transform: translateY(0px) rotateX(8deg) rotateY(-8deg); }
+            100% { transform: translateY(-12px) rotateX(-8deg) rotateY(8deg); }
+        }
+
+        .shield {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px 12px 75px 75px;
+            box-shadow: 
+                inset 0 4px 12px rgba(255, 255, 255, 0.35),
+                inset 0 -10px 25px rgba(0, 0, 0, 0.6),
+                0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 3px solid rgba(255, 223, 100, 0.8);
+            transform: translateZ(25px);
+            overflow: hidden;
+        }
+
+        /* Clean Refined Glossy Specular Highlight Sweep */
+        .shield::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 100%);
+            pointer-events: none;
+        }
+
+        .shield-letter {
+            font-family: 'Cinzel', serif;
+            font-size: 90px;
+            font-weight: 800;
+            background: linear-gradient(180deg, #fff7cc 0%, #ffd700 45%, #b38808 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+            transform: translateZ(35px);
+            margin-top: -10px;
+        }
+
+        .banner {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+            color: #1e293b;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            position: relative;
+            margin-top: -16px;
+            z-index: 5;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            transform: translateZ(45px);
+        }
+
+        .banner::before, .banner::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            z-index: -1;
+            border: 14px solid #cbd5e1;
+        }
+
+        .banner::before {
+            left: -12px;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(-12deg);
+        }
+
+        .banner::after {
+            right: -12px;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(12deg);
+        }
+
+        /* House Gradient Color Schemes */
+        .altruismo { background: linear-gradient(145deg, #334155, #0f172a); }
+        .amistad { background: linear-gradient(145deg, #ef4444, #7f1d1d); }
+        .isibindi { background: linear-gradient(145deg, #10b981, #064e3b); }
+        .reveur { background: linear-gradient(145deg, #3b82f6, #1e3a8a); }
+        .protos { background: linear-gradient(145deg, #14b8a6, #115e59); }
+        .onraka { background: linear-gradient(145deg, #f97316, #7c2d12); }
+        .sollevare { background: linear-gradient(145deg, #eab308, #713f12); }
+        .nukumori { background: linear-gradient(145deg, #a855f7, #581c87); }
+
+        .house-traits-grid {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .trait-badge {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            text-transform: uppercase;
+        }
+
+        .house-description {
+            font-size: 1.05rem;
+            color: #e5e7eb;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            padding: 18px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Scrolling Castle Wall Background Canvas -->
+    <canvas id="castle-canvas"></canvas>
+
+    <!-- RCA Top Accent Bar -->
+    <div class="rca-top-bar"></div>
+
+    <div class="quiz-wrapper" id="quiz-card">
+        <div class="quiz-header">
+            <h1>Wallace Stegner Academy</h1>
+            <p>House Sorting Ceremony</p>
+        </div>
+
+        <div class="progress-bar-container" id="progress-container" style="display: none;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- STEP 0: NAME INPUT -->
+        <div id="name-screen">
+            <div class="question-text">Enter your full name to begin your sorting journey:</div>
+            <input type="text" id="candidate-name" class="name-input-field" placeholder="e.g. Jordan Smith" autocomplete="off">
+            <button class="action-btn" onclick="startQuiz()" style="width: 100%; margin-top: 10px;">Begin Sorting</button>
+        </div>
+
+        <!-- DYNAMIC QUIZ FORM -->
+        <div id="quiz-form"></div>
+
+        <!-- BUTTON CONTROLS -->
+        <div class="btn-group" id="nav-buttons" style="display: none;">
+            <button class="secondary-btn" id="prev-btn" onclick="prevStep()">Previous</button>
+            <button class="action-btn" id="next-btn" onclick="nextStep()" disabled>Next Question</button>
+        </div>
+
+        <!-- RESULTS SCREEN WITH REORDERED HIERARCHY -->
+        <div id="result-screen">
+            <div class="welcome-candidate" id="result-candidate-name"></div>
+            
+            <!-- Modern 3D Rendered Shield Crest Display -->
+            <div id="crest-display-container"></div>
+
+            <div class="welcome-candidate" style="margin-top: 10px;">Welcome to your new home at Wallace Stegner Academy</div>
+            <div class="house-title" id="house-name-display"></div>
+            <div class="house-traits-grid" id="house-traits-container"></div>
+            <p class="house-description" id="house-desc-display"></p>
+            <button class="action-btn" id="result-action-btn" onclick="location.reload()">Retake Sorting</button>
+        </div>
+    </div>
+
+    <script>
+        // 3D Isometric Castle Wall & Floating Magical Particles Background FX
+        const castleCanvas = document.getElementById('castle-canvas');
+        const castleCtx = castleCanvas.getContext('2d', { alpha: false });
+
+        function resizeCastleCanvas() {
+            castleCanvas.width = window.innerWidth;
+            castleCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCastleCanvas);
+        resizeCastleCanvas();
+
+        let wallScrollY = 0;
+        let magicalParticles = [];
+        for (let i = 0; i < 80; i++) {
+            magicalParticles.push({
+                x: Math.random() * castleCanvas.width,
+                y: Math.random() * castleCanvas.height,
+                size: Math.random() * 2.5 + 0.5,
+                speedY: Math.random() * 0.4 + 0.1,
+                speedX: (Math.random() - 0.5) * 0.3,
+                alpha: Math.random() * 0.6 + 0.2
+            });
+        }
+
+        const brickWidth = 140;
+        const brickHeight = 70;
+        const doubleBrickHeight = brickHeight * 2;
+
+        function drawCastleWall() {
+            const bgGrad = castleCtx.createLinearGradient(0, 0, 0, castleCanvas.height);
+            bgGrad.addColorStop(0, '#020305');
+            bgGrad.addColorStop(0.5, '#070a11');
+            bgGrad.addColorStop(1, '#0c121e');
+            castleCtx.fillStyle = bgGrad;
+            castleCtx.fillRect(0, 0, castleCanvas.width, castleCanvas.height);
+
+            wallScrollY += 0.4; 
+            if (wallScrollY >= doubleBrickHeight) {
+                wallScrollY -= doubleBrickHeight;
+            }
+
+            castleCtx.lineWidth = 2;
+
+            for (let y = -doubleBrickHeight; y < castleCanvas.height + doubleBrickHeight; y += brickHeight) {
+                const drawY = Math.floor(y + wallScrollY);
+                const rowIndex = Math.floor((y + doubleBrickHeight * 10) / brickHeight); 
+                const offset = (rowIndex % 2 === 0) ? 0 : brickWidth / 2;
+                
+                for (let x = -brickWidth; x < castleCanvas.width + brickWidth; x += brickWidth) {
+                    const drawX = Math.floor(x + offset);
+                    const isDarkBrick = (rowIndex + Math.floor(drawX / brickWidth)) % 3 === 0;
+                    castleCtx.fillStyle = isDarkBrick ? 'rgba(255, 255, 255, 0.015)' : 'rgba(0, 0, 0, 0.3)';
+                    castleCtx.fillRect(drawX + 1, drawY + 1, brickWidth - 2, brickHeight - 2);
+
+                    castleCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                    castleCtx.strokeRect(drawX, drawY, brickWidth, brickHeight);
+
+                    castleCtx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+                    castleCtx.beginPath();
+                    castleCtx.moveTo(drawX + brickWidth, drawY);
+                    castleCtx.lineTo(drawX, drawY);
+                    castleCtx.lineTo(drawX, drawY + brickHeight);
+                    castleCtx.stroke();
+                }
+            }
+
+            const time = Date.now() * 0.0015;
+            const flicker = Math.sin(time * 5) * 0.03 + Math.cos(time * 3) * 0.03;
+            
+            const leftGrad = castleCtx.createRadialGradient(80, castleCanvas.height * 0.3, 10, 80, castleCanvas.height * 0.3, 500);
+            leftGrad.addColorStop(0, `rgba(245, 158, 11, ${0.15 + flicker})`);
+            leftGrad.addColorStop(0.5, `rgba(217, 119, 6, 0.05)`);
+            leftGrad.addColorStop(1, 'transparent');
+            castleCtx.fillStyle = leftGrad;
+            castleCtx.fillRect(0, 0, castleCanvas.width, castleCanvas.height);
+
+            const rightGrad = castleCtx.createRadialGradient(castleCanvas.width - 80, castleCanvas.height * 0.7, 10, castleCanvas.width - 80, castleCanvas.height * 0.7, 500);
+            rightGrad.addColorStop(0, `rgba(245, 158, 11, ${0.15 - flicker})`);
+            rightGrad.addColorStop(0.5, `rgba(217, 119, 6, 0.05)`);
+            rightGrad.addColorStop(1, 'transparent');
+            castleCtx.fillStyle = rightGrad;
+            castleCtx.fillRect(0, 0, castleCanvas.width, castleCanvas.height);
+
+            castleCtx.fillStyle = '#fbbf24';
+            magicalParticles.forEach(p => {
+                p.y -= p.speedY;
+                p.x += p.speedX + Math.sin(p.y * 0.02) * 0.3;
+                if (p.y < 0) {
+                    p.y = castleCanvas.height + 10;
+                    p.x = Math.random() * castleCanvas.width;
+                }
+                castleCtx.save();
+                castleCtx.globalAlpha = p.alpha;
+                castleCtx.shadowBlur = 8;
+                castleCtx.shadowColor = '#fbbf24';
+                castleCtx.beginPath();
+                castleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                castleCtx.fill();
+                castleCtx.restore();
+            });
+
+            requestAnimationFrame(drawCastleWall);
+        }
+        drawCastleWall();
+
+        // 3D Tilt Effect on Quiz Card (Desktop & Touch Optimized)
+        const quizCard = document.getElementById('quiz-card');
+        
+        function handleTilt(clientX, clientY) {
+            const xAxis = (window.innerWidth / 2 - clientX) / 50;
+            const yAxis = (window.innerHeight / 2 - clientY) / 50;
+            quizCard.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            handleTilt(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                handleTilt(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        window.addEventListener('mouseleave', () => {
+            quizCard.style.transform = 'rotateY(0deg) rotateX(0deg)';
+            quizCard.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        });
+
+        window.addEventListener('mouseenter', () => {
+            quizCard.style.transition = 'none';
+        });
+
+        // HOUSE METADATA WITH ANIMATED CREST CONFIGURATION
+        const housesData = {
+            "Reveur": {
+                name: "Rêveur",
+                letter: "R",
+                cssClass: "reveur",
+                desc: "The House of Dreams. Associated with Blue, creativity, imagination, big dreams, and a vibrant passion for exploring new possibilities.",
+                primaryColor: "#3b82f6",
+                traits: ["Dreams", "Creativity", "Imagination", "Passion"]
+            },
+            "Amistad": {
+                name: "Amistad",
+                letter: "A",
+                cssClass: "amistad",
+                desc: "The House of Friendship. Associated with Red, strong bonds, loyalty, empathy, supportive community building, and unconquered spirit.",
+                primaryColor: "#ef4444",
+                traits: ["Friendship", "Loyalty", "Empathy", "Community"]
+            },
+            "Isibindi": {
+                name: "Isibindi",
+                letter: "I",
+                cssClass: "isibindi",
+                desc: "The House of Courage. Associated with Green, bravery, strategic thinking, resilience, and standing tall against challenges.",
+                primaryColor: "#10b981",
+                traits: ["Courage", "Bravery", "Resilience", "Strength"]
+            },
+            "Altruismo": {
+                name: "Altruismo",
+                letter: "A",
+                cssClass: "altruismo",
+                desc: "The House of Givers. Associated with Black & Silver, wisdom, competitive drive, strategic leadership, and giving back to the community.",
+                primaryColor: "#334155",
+                traits: ["Givers", "Leadership", "Wisdom", "Drive"]
+            },
+            "Protos": {
+                name: "Protos",
+                letter: "P",
+                cssClass: "protos",
+                desc: "The House of Success. Associated with Turquoise, intellect, prestige, patience, knowledge, and striving for excellence.",
+                primaryColor: "#14b8a6",
+                traits: ["Success", "Intellect", "Prestige", "Excellence"]
+            },
+            "Nukumori": {
+                name: "Nukumori",
+                letter: "N",
+                cssClass: "nukumori",
+                desc: "The House of Kindness & Warmth. Associated with Purple, protective nature, deep respect, gentle strength, and heartfelt connection.",
+                primaryColor: "#a855f7",
+                traits: ["Kindness", "Warmth", "Respect", "Connection"]
+            }
+        };
+
+        const quizQuestions = [
+            {
+                id: 1, title: "A. CHOOSE A COLOR.",
+                options: [
+                    { letter: "A", text: "Blue", house: "Reveur" }, { letter: "B", text: "Red", house: "Amistad" },
+                    { letter: "C", text: "Green", house: "Isibindi" }, { letter: "D", text: "Black", house: "Altruismo" },
+                    { letter: "E", text: "Turquoise", house: "Protos" }, { letter: "F", text: "Purple", house: "Nukumori" }
+                ]
+            },
+            {
+                id: 2, title: "B. CHOOSE A LANGUAGE YOU WOULD LIKE TO LEARN.",
+                options: [
+                    { letter: "A", text: "Greek", house: "Protos" }, { letter: "B", text: "Spanish", house: "Amistad" },
+                    { letter: "C", text: "Portuguese", house: "Altruismo" }, { letter: "D", text: "French", house: "Reveur" },
+                    { letter: "E", text: "Zulu", house: "Isibindi" }, { letter: "F", text: "Japanese", house: "Nukumori" }
+                ]
+            },
+            {
+                id: 3, title: "C. WHERE WOULD YOU MOST LIKE TO TRAVEL?",
+                options: [
+                    { letter: "A", text: "Japan", house: "Nukumori" }, { letter: "B", text: "Greece", house: "Protos" },
+                    { letter: "C", text: "Mexico", house: "Amistad" }, { letter: "D", text: "South Africa", house: "Isibindi" },
+                    { letter: "E", text: "France", house: "Reveur" }, { letter: "F", text: "Brazil", house: "Altruismo" }
+                ]
+            },
+            {
+                id: 4, title: "D. CHOOSE YOUR SPIRIT ANIMAL.",
+                options: [
+                    { letter: "A", text: "Wolf", house: "Reveur" }, { letter: "B", text: "Dragon", house: "Nukumori" },
+                    { letter: "C", text: "Swan", house: "Isibindi" }, { letter: "D", text: "Bear", house: "Protos" },
+                    { letter: "E", text: "Snake", house: "Altruismo" }, { letter: "F", text: "Peacock", house: "Amistad" }
+                ]
+            },
+            {
+                id: 5, title: "E. WHICH QUALITY IS MOST IMPORTANT TO YOU?",
+                options: [
+                    { letter: "A", text: "Knowledge", house: "Protos" }, { letter: "B", text: "Creativity", house: "Isibindi" },
+                    { letter: "C", text: "Giving", house: "Altruismo" }, { letter: "D", text: "Achieving", house: "Reveur" },
+                    { letter: "E", text: "Self-Reflection", house: "Amistad" }, { letter: "F", text: "Kindness", house: "Nukumori" }
+                ]
+            },
+            {
+                id: 6, title: "F. HOW WOULD OTHERS DESCRIBE YOU?",
+                options: [
+                    { letter: "A", text: "Dreamer", house: "Reveur" }, { letter: "B", text: "Leader", house: "Altruismo" },
+                    { letter: "C", text: "Brave", house: "Isibindi" }, { letter: "D", text: "Friendly", house: "Amistad" },
+                    { letter: "E", text: "Intelligent", house: "Protos" }, { letter: "F", text: "Warm", house: "Nukumori" }
+                ]
+            }
+        ];
+
+        let currentStep = 0; // 0 is Name Screen, 1-6 are Questions
+        let candidateName = "";
+        let userAnswers = {};
+
+        const nameScreen = document.getElementById('name-screen');
+        const quizForm = document.getElementById('quiz-form');
+        const navButtons = document.getElementById('nav-buttons');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const resultScreen = document.getElementById('result-screen');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+
+        function startQuiz() {
+            const nameInput = document.getElementById('candidate-name');
+            candidateName = nameInput.value.trim();
+            if(!candidateName) {
+                alert("Please enter your name to begin sorting!");
+                nameInput.focus();
+                return;
+            }
+
+            nameScreen.style.display = 'none';
+            progressContainer.style.display = 'block';
+            navButtons.style.display = 'flex';
+
+            buildQuizDOM();
+            currentStep = 1;
+            showStep(currentStep);
+        }
+
+        function buildQuizDOM() {
+            quizForm.innerHTML = '';
+            quizQuestions.forEach((q, index) => {
+                const stepNum = index + 1;
+                const block = document.createElement('div');
+                block.className = 'question-block';
+                block.id = `question-block-${stepNum}`;
+
+                let optionsHTML = '';
+                q.options.forEach(opt => {
+                    const isChecked = userAnswers[stepNum] === opt.house ? 'checked' : '';
+                    const isSelectedClass = userAnswers[stepNum] === opt.house ? 'selected' : '';
+                    
+                    optionsHTML += `
+                        <label class="option-label ${isSelectedClass}" onclick="selectOption(${stepNum}, '${opt.house}', this)">
+                            <input type="radio" name="q_${stepNum}" value="${opt.house}" ${isChecked}>
+                            <div class="option-badge">${opt.letter}</div>
+                            <div class="option-text">${opt.text}</div>
+                        </label>
+                    `;
+                });
+
+                block.innerHTML = `
+                    <div class="question-text">${q.title}</div>
+                    <div class="options-grid">${optionsHTML}</div>
+                `;
+                quizForm.appendChild(block);
+            });
+        }
+
+        function selectOption(stepNum, houseKey, labelElement) {
+            userAnswers[stepNum] = houseKey;
+            
+            const parentBlock = document.getElementById(`question-block-${stepNum}`);
+            parentBlock.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
+            labelElement.classList.add('selected');
+            labelElement.querySelector('input').checked = true;
+
+            nextBtn.disabled = false;
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.question-block').forEach(b => b.classList.remove('active'));
+            const activeBlock = document.getElementById(`question-block-${step}`);
+            if(activeBlock) activeBlock.classList.add('active');
+
+            const progressPct = ((step - 1) / quizQuestions.length) * 100;
+            progressBar.style.width = `${progressPct}%`;
+
+            prevBtn.style.display = step === 1 ? 'none' : 'block';
+            nextBtn.disabled = !userAnswers[step];
+            nextBtn.innerText = step === quizQuestions.length ? 'Complete Sorting' : 'Next Question';
+        }
+
+        function nextStep() {
+            if(!userAnswers[currentStep]) return;
+
+            if(currentStep < quizQuestions.length) {
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                calculateResults();
+            }
+        }
+
+        function prevStep() {
+            if(currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function calculateResults() {
+            let tallies = { "Reveur": 0, "Amistad": 0, "Isibindi": 0, "Altruismo": 0, "Protos": 0, "Nukumori": 0 };
+            Object.values(userAnswers).forEach(house => {
+                if(tallies[house] !== undefined) {
+                    tallies[house]++;
+                }
+            });
+
+            let winningHouse = Object.keys(tallies).reduce((a, b) => tallies[a] > tallies[b] ? a : b);
+            const houseInfo = housesData[winningHouse];
+
+            progressContainer.style.display = 'none';
+            quizForm.style.display = 'none';
+            navButtons.style.display = 'none';
+
+            document.getElementById('result-candidate-name').innerText = `Candidate: ${candidateName}`;
+            document.getElementById('house-name-display').innerText = houseInfo.name;
+            document.getElementById('house-name-display').style.color = houseInfo.primaryColor;
+            document.getElementById('house-desc-display').innerText = houseInfo.desc;
+
+            const traitsContainer = document.getElementById('house-traits-container');
+            traitsContainer.innerHTML = '';
+            houseInfo.traits.forEach(trait => {
+                const badge = document.createElement('div');
+                badge.className = 'trait-badge';
+                badge.style.color = houseInfo.primaryColor;
+                badge.innerText = trait;
+                traitsContainer.appendChild(badge);
+            });
+
+            // Render Modern 3D Crest First in Sequence Below Name
+            const crestDisplayContainer = document.getElementById('crest-display-container');
+            crestDisplayContainer.innerHTML = `
+                <div class="crest-wrapper" id="finalCrest">
+                    <div class="shield-3d-scene">
+                        <div class="shield ${houseInfo.cssClass}">
+                            <div class="shield-letter">${houseInfo.letter}</div>
+                        </div>
+                    </div>
+                    <div class="banner">${houseInfo.name}</div>
+                </div>
+            `;
+
+            resultScreen.style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('finalCrest').classList.add('visible');
+            }, 100);
+        }
+    </script>
+</body>
+</html>
