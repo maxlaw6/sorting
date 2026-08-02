@@ -455,7 +455,6 @@
             overflow: hidden;
         }
 
-        /* Clean Refined Glossy Specular Highlight Sweep */
         .shield::after {
             content: '';
             position: absolute;
@@ -524,8 +523,6 @@
         .isibindi { background: linear-gradient(145deg, #10b981, #064e3b); }
         .reveur { background: linear-gradient(145deg, #3b82f6, #1e3a8a); }
         .protos { background: linear-gradient(145deg, #14b8a6, #115e59); }
-        .onraka { background: linear-gradient(145deg, #f97316, #7c2d12); }
-        .sollevare { background: linear-gradient(145deg, #eab308, #713f12); }
         .nukumori { background: linear-gradient(145deg, #a855f7, #581c87); }
 
         .house-traits-grid {
@@ -562,6 +559,87 @@
             border-radius: 16px;
             border: 1px solid rgba(255,255,255,0.05);
         }
+
+        /* Taylor Swift Fanfare Easter Egg Banner */
+        .ts-easter-egg {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
+            animation: pulseTs 2s infinite alternate;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        @keyframes pulseTs {
+            from { transform: scale(1); box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); }
+            to { transform: scale(1.03); box-shadow: 0 0 30px rgba(236, 72, 153, 0.9); }
+        }
+
+        /* Non-blocking Speech Bubble that Slides in from Bottom */
+        .ts-speech-toast {
+            position: fixed;
+            bottom: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ffffff, #f3f4f6);
+            color: #1e293b;
+            padding: 24px 38px;
+            border-radius: 20px 20px 0 0;
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.7), 0 0 30px rgba(236, 72, 153, 0.5);
+            border: 3px solid #ec4899;
+            border-bottom: none;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2000;
+            pointer-events: none;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ts-speech-toast.show {
+            transform: translateX(-50%) translateY(-150px);
+        }
+
+        @media(max-width: 768px) {
+            .ts-speech-toast {
+                font-size: 0.95rem;
+                padding: 18px 24px;
+                width: 90%;
+            }
+            .ts-speech-toast.show {
+                transform: translateX(-50%) translateY(-130px);
+            }
+        }
+
+        /* Falling Iconic Lyrics (Behind Sorting Window, z-index: 2) */
+        .lyric-particle {
+            position: fixed;
+            z-index: 2;
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 0 12px rgba(236, 72, 153, 0.9), 0 0 25px rgba(59, 130, 246, 0.7);
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+            animation: fallLyric linear forwards;
+        }
+
+        @keyframes fallLyric {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.9; }
+            90% { opacity: 0.9; }
+            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -571,6 +649,11 @@
 
     <!-- RCA Top Accent Bar -->
     <div class="rca-top-bar"></div>
+
+    <!-- Non-blocking Speech Bubble Toast that Slides in from Bottom -->
+    <div class="ts-speech-toast" id="tsSpeechToast">
+        ✨ Welcome to the best house! Are you ready for it? ✨
+    </div>
 
     <div class="quiz-wrapper" id="quiz-card">
         <div class="quiz-header">
@@ -598,10 +681,13 @@
             <button class="action-btn" id="next-btn" onclick="nextStep()" disabled>Next Question</button>
         </div>
 
-        <!-- RESULTS SCREEN WITH REORDERED HIERARCHY -->
+        <!-- RESULTS SCREEN -->
         <div id="result-screen">
             <div class="welcome-candidate" id="result-candidate-name"></div>
             
+            <!-- Protos Easter Egg Banner Area -->
+            <div id="easter-egg-container"></div>
+
             <!-- Modern 3D Rendered Shield Crest Display -->
             <div id="crest-display-container"></div>
 
@@ -614,7 +700,6 @@
     </div>
 
     <script>
-        // 3D Isometric Castle Wall & Floating Magical Particles Background FX
         const castleCanvas = document.getElementById('castle-canvas');
         const castleCtx = castleCanvas.getContext('2d', { alpha: false });
 
@@ -719,7 +804,7 @@
         }
         drawCastleWall();
 
-        // 3D Tilt Effect on Quiz Card (Desktop & Touch Optimized)
+        // 3D Tilt Effect on Quiz Card
         const quizCard = document.getElementById('quiz-card');
         
         function handleTilt(clientX, clientY) {
@@ -728,80 +813,53 @@
             quizCard.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
 
-        window.addEventListener('mousemove', (e) => {
-            handleTilt(e.clientX, e.clientY);
-        });
-
+        window.addEventListener('mousemove', (e) => { handleTilt(e.clientX, e.clientY); });
         window.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 0) {
-                handleTilt(e.touches[0].clientX, e.touches[0].clientY);
-            }
+            if (e.touches.length > 0) { handleTilt(e.touches[0].clientX, e.touches[0].clientY); }
         }, { passive: true });
 
         window.addEventListener('mouseleave', () => {
             quizCard.style.transform = 'rotateY(0deg) rotateX(0deg)';
             quizCard.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)';
         });
+        window.addEventListener('mouseenter', () => { quizCard.style.transition = 'none'; });
 
-        window.addEventListener('mouseenter', () => {
-            quizCard.style.transition = 'none';
-        });
-
-        // HOUSE METADATA WITH ANIMATED CREST CONFIGURATION
         const housesData = {
             "Reveur": {
-                name: "Rêveur",
-                letter: "R",
-                cssClass: "reveur",
+                name: "Rêveur", letter: "R", cssClass: "reveur",
                 desc: "The House of Dreams. Associated with Blue, creativity, imagination, big dreams, and a vibrant passion for exploring new possibilities.",
-                primaryColor: "#3b82f6",
-                traits: ["Dreams", "Creativity", "Imagination", "Passion"]
+                primaryColor: "#3b82f6", traits: ["Dreams", "Creativity", "Imagination", "Passion"]
             },
             "Amistad": {
-                name: "Amistad",
-                letter: "A",
-                cssClass: "amistad",
+                name: "Amistad", letter: "A", cssClass: "amistad",
                 desc: "The House of Friendship. Associated with Red, strong bonds, loyalty, empathy, supportive community building, and unconquered spirit.",
-                primaryColor: "#ef4444",
-                traits: ["Friendship", "Loyalty", "Empathy", "Community"]
+                primaryColor: "#ef4444", traits: ["Friendship", "Loyalty", "Empathy", "Community"]
             },
             "Isibindi": {
-                name: "Isibindi",
-                letter: "I",
-                cssClass: "isibindi",
+                name: "Isibindi", letter: "I", cssClass: "isibindi",
                 desc: "The House of Courage. Associated with Green, bravery, strategic thinking, resilience, and standing tall against challenges.",
-                primaryColor: "#10b981",
-                traits: ["Courage", "Bravery", "Resilience", "Strength"]
+                primaryColor: "#10b981", traits: ["Courage", "Bravery", "Resilience", "Strength"]
             },
             "Altruismo": {
-                name: "Altruismo",
-                letter: "A",
-                cssClass: "altruismo",
+                name: "Altruismo", letter: "A", cssClass: "altruismo",
                 desc: "The House of Givers. Associated with Black & Silver, wisdom, competitive drive, strategic leadership, and giving back to the community.",
-                primaryColor: "#334155",
-                traits: ["Givers", "Leadership", "Wisdom", "Drive"]
+                primaryColor: "#334155", traits: ["Givers", "Leadership", "Wisdom", "Drive"]
             },
             "Protos": {
-                name: "Protos",
-                letter: "P",
-                cssClass: "protos",
+                name: "Protos", letter: "P", cssClass: "protos",
                 desc: "The House of Success. Associated with Turquoise, intellect, prestige, patience, knowledge, and striving for excellence.",
-                primaryColor: "#14b8a6",
-                traits: ["Success", "Intellect", "Prestige", "Excellence"]
+                primaryColor: "#14b8a6", traits: ["Success", "Intellect", "Prestige", "Excellence"]
             },
             "Nukumori": {
-                name: "Nukumori",
-                letter: "N",
-                cssClass: "nukumori",
+                name: "Nukumori", letter: "N", cssClass: "nukumori",
                 desc: "The House of Kindness & Warmth. Associated with Purple, protective nature, deep respect, gentle strength, and heartfelt connection.",
-                primaryColor: "#a855f7",
-                traits: ["Kindness", "Warmth", "Respect", "Connection"]
+                primaryColor: "#a855f7", traits: ["Kindness", "Warmth", "Respect", "Connection"]
             }
         };
 
         const quizQuestions = [
             {
-                id: 1, title: "A. CHOOSE A COLOR.",
+                id: 1, title: "1. CHOOSE A COLOR.",
                 options: [
                     { letter: "A", text: "Blue", house: "Reveur" }, { letter: "B", text: "Red", house: "Amistad" },
                     { letter: "C", text: "Green", house: "Isibindi" }, { letter: "D", text: "Black", house: "Altruismo" },
@@ -809,7 +867,7 @@
                 ]
             },
             {
-                id: 2, title: "B. CHOOSE A LANGUAGE YOU WOULD LIKE TO LEARN.",
+                id: 2, title: "2. CHOOSE A LANGUAGE YOU WOULD LIKE TO LEARN.",
                 options: [
                     { letter: "A", text: "Greek", house: "Protos" }, { letter: "B", text: "Spanish", house: "Amistad" },
                     { letter: "C", text: "Portuguese", house: "Altruismo" }, { letter: "D", text: "French", house: "Reveur" },
@@ -817,7 +875,7 @@
                 ]
             },
             {
-                id: 3, title: "C. WHERE WOULD YOU MOST LIKE TO TRAVEL?",
+                id: 3, title: "3. WHERE WOULD YOU MOST LIKE TO TRAVEL?",
                 options: [
                     { letter: "A", text: "Japan", house: "Nukumori" }, { letter: "B", text: "Greece", house: "Protos" },
                     { letter: "C", text: "Mexico", house: "Amistad" }, { letter: "D", text: "South Africa", house: "Isibindi" },
@@ -825,7 +883,7 @@
                 ]
             },
             {
-                id: 4, title: "D. CHOOSE YOUR SPIRIT ANIMAL.",
+                id: 4, title: "4. CHOOSE YOUR SPIRIT ANIMAL.",
                 options: [
                     { letter: "A", text: "Wolf", house: "Reveur" }, { letter: "B", text: "Dragon", house: "Nukumori" },
                     { letter: "C", text: "Swan", house: "Isibindi" }, { letter: "D", text: "Bear", house: "Protos" },
@@ -833,7 +891,7 @@
                 ]
             },
             {
-                id: 5, title: "E. WHICH QUALITY IS MOST IMPORTANT TO YOU?",
+                id: 5, title: "5. WHICH QUALITY IS MOST IMPORTANT TO YOU?",
                 options: [
                     { letter: "A", text: "Knowledge", house: "Protos" }, { letter: "B", text: "Creativity", house: "Isibindi" },
                     { letter: "C", text: "Giving", house: "Altruismo" }, { letter: "D", text: "Achieving", house: "Reveur" },
@@ -841,18 +899,35 @@
                 ]
             },
             {
-                id: 6, title: "F. HOW WOULD OTHERS DESCRIBE YOU?",
+                id: 6, title: "6. HOW WOULD OTHERS DESCRIBE YOU?",
                 options: [
-                    { letter: "A", text: "Dreamer", house: "Reveur" }, { letter: "B", text: "Leader", house: "Altruismo" },
-                    { letter: "C", text: "Brave", house: "Isibindi" }, { letter: "D", text: "Friendly", house: "Amistad" },
-                    { letter: "E", text: "Intelligent", house: "Protos" }, { letter: "F", text: "Warm", house: "Nukumori" }
+                    { letter: "A", text: "Dreamer", house: "Reveur" }, { letter: "B", text: "Competitive", house: "Altruismo" },
+                    { letter: "C", text: "Patient", house: "Protos" }, { letter: "D", text: "Great Friend", house: "Amistad" },
+                    { letter: "E", text: "Protective", house: "Nukumori" }, { letter: "F", text: "Strategic", house: "Isibindi" }
+                ]
+            },
+            {
+                id: 7, title: "7. PICK THE ONE THAT SPEAKS TO YOU.",
+                options: [
+                    { letter: "A", text: "Unicorn", house: "Reveur" }, { letter: "B", text: "Samurai", house: "Nukumori" },
+                    { letter: "C", text: "Corinthian Soldier", house: "Protos" }, { letter: "D", text: "Lion", house: "Isibindi" },
+                    { letter: "E", text: "Griffin", house: "Altruismo" }, { letter: "F", text: "Knight", house: "Amistad" }
+                ]
+            },
+            {
+                id: 8, title: "8. PICK THE QUALITY THAT SPEAKS TO YOU.",
+                options: [
+                    { letter: "A", text: "Wisdom", house: "Altruismo" }, { letter: "B", text: "Courage", house: "Isibindi" },
+                    { letter: "C", text: "Passion", house: "Reveur" }, { letter: "D", text: "Prestige", house: "Protos" },
+                    { letter: "E", text: "Unconquered Spirit", house: "Amistad" }, { letter: "F", text: "Respect", house: "Nukumori" }
                 ]
             }
         ];
 
-        let currentStep = 0; // 0 is Name Screen, 1-6 are Questions
+        let currentStep = 0;
         let candidateName = "";
         let userAnswers = {};
+        let lyricRainInterval = null;
 
         const nameScreen = document.getElementById('name-screen');
         const quizForm = document.getElementById('quiz-form');
@@ -862,6 +937,7 @@
         const resultScreen = document.getElementById('result-screen');
         const nextBtn = document.getElementById('next-btn');
         const prevBtn = document.getElementById('prev-btn');
+        const tsSpeechToast = document.getElementById('tsSpeechToast');
 
         function startQuiz() {
             const nameInput = document.getElementById('candidate-name');
@@ -953,6 +1029,55 @@
             }
         }
 
+        function triggerProtosFireworks() {
+            for (let i = 0; i < 35; i++) {
+                magicalParticles.push({
+                    x: castleCanvas.width / 2 + (Math.random() - 0.5) * 400,
+                    y: castleCanvas.height / 2 + (Math.random() - 0.5) * 300,
+                    size: Math.random() * 4 + 1,
+                    speedY: (Math.random() - 0.5) * 4,
+                    speedX: (Math.random() - 0.5) * 4,
+                    alpha: 1
+                });
+            }
+        }
+
+        const iconicLyrics = [
+            "✨ Cruel Summer ✨",
+            "✨ Are You Ready For It? ✨",
+            "✨ Long Live All the Magic We Made ✨",
+            "✨ Shake It Off ✨",
+            "✨ Mastermind ✨",
+            "✨ Karma Is My Boyfriend ✨",
+            "✨ Welcome to New York ✨",
+            "✨ Fearless ✨",
+            "✨ Bejeweled ✨",
+            "✨ Lavender Haze ✨",
+            "✨ Call It What You Want ✨",
+            "✨ Sparks Fly ✨"
+        ];
+
+        function startLyricRain() {
+            lyricRainInterval = setInterval(() => {
+                const lyricEl = document.createElement('div');
+                lyricEl.className = 'lyric-particle';
+                lyricEl.innerText = iconicLyrics[Math.floor(Math.random() * iconicLyrics.length)];
+                
+                const randomX = Math.random() * (window.innerWidth - 200);
+                const duration = Math.random() * 4 + 5; // 5 to 9 seconds
+                
+                lyricEl.style.left = `${randomX}px`;
+                lyricEl.style.top = `-50px`;
+                lyricEl.style.animationDuration = `${duration}s`;
+                
+                document.body.appendChild(lyricEl);
+
+                setTimeout(() => {
+                    lyricEl.remove();
+                }, duration * 1000);
+            }, 600);
+        }
+
         function calculateResults() {
             let tallies = { "Reveur": 0, "Amistad": 0, "Isibindi": 0, "Altruismo": 0, "Protos": 0, "Nukumori": 0 };
             Object.values(userAnswers).forEach(house => {
@@ -961,7 +1086,44 @@
                 }
             });
 
-            let winningHouse = Object.keys(tallies).reduce((a, b) => tallies[a] > tallies[b] ? a : b);
+            // TIEBREAKER LOGIC:
+            // Tiebreaker 1: Color (Question 1)
+            // Tiebreaker 2: Travel (Question 3)
+            // Tiebreaker 3: How others describe you (Question 6)
+            let maxScore = -1;
+            let tiedHouses = [];
+
+            for (let house in tallies) {
+                if (tallies[house] > maxScore) {
+                    maxScore = tallies[house];
+                    tiedHouses = [house];
+                } else if (tallies[house] === maxScore) {
+                    tiedHouses.push(house);
+                }
+            }
+
+            let winningHouse;
+            if (tiedHouses.length > 1) {
+                const q1Choice = userAnswers[1];
+                if (q1Choice && tiedHouses.includes(q1Choice)) {
+                    winningHouse = q1Choice;
+                } else {
+                    const q3Choice = userAnswers[3];
+                    if (q3Choice && tiedHouses.includes(q3Choice)) {
+                        winningHouse = q3Choice;
+                    } else {
+                        const q6Choice = userAnswers[6];
+                        if (q6Choice && tiedHouses.includes(q6Choice)) {
+                            winningHouse = q6Choice;
+                        } else {
+                            winningHouse = tiedHouses[Math.floor(Math.random() * tiedHouses.length)];
+                        }
+                    }
+                }
+            } else {
+                winningHouse = tiedHouses[0];
+            }
+
             const houseInfo = housesData[winningHouse];
 
             progressContainer.style.display = 'none';
@@ -983,7 +1145,22 @@
                 traitsContainer.appendChild(badge);
             });
 
-            // Render Modern 3D Crest First in Sequence Below Name
+            // Handle Protos Fanfare / Taylor Swift Easter Egg
+            const easterEggContainer = document.getElementById('easter-egg-container');
+            easterEggContainer.innerHTML = '';
+            if (winningHouse === "Protos") {
+                triggerProtosFireworks();
+                easterEggContainer.innerHTML = `
+                    <div class="ts-easter-egg">
+                        ✨ Cruel Summer Fanfare Activated! Welcome to the Protos Era! 🎆
+                    </div>
+                `;
+                setTimeout(() => {
+                    tsSpeechToast.classList.add('show');
+                    startLyricRain();
+                }, 600);
+            }
+
             const crestDisplayContainer = document.getElementById('crest-display-container');
             crestDisplayContainer.innerHTML = `
                 <div class="crest-wrapper" id="finalCrest">
