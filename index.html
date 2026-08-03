@@ -727,7 +727,7 @@
             <div class="house-traits-grid" id="house-traits-container"></div>
             <p class="house-description" id="house-desc-display"></p>
             
-            <!-- NEW: Manual Override Selector -->
+            <!-- Manual Override Selector -->
             <div class="manual-picker-section" id="manual-picker-area">
                 <label for="manual-house-select" style="font-family:'Cinzel', serif; font-weight:700; font-size:0.9rem; color:#fbbf24;">Prefer a different house? Pick manually:</label>
                 <select id="manual-house-select" onchange="overrideHouse(this.value)">
@@ -748,8 +748,8 @@
     </div>
 
     <script>
-        // REPLACE THIS URL with your deployed Google Apps Script Web App URL once configured
-        const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_URL_HERE";
+        // Google Apps Script Web App Endpoint linked for spreadsheet logging
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMhLExbNom1vsp616rFMwhLON1xTjSmlKu-htotPQTBTqQQOudN-Fd3gSriEN68HxKGg/exec";
 
         const castleCanvas = document.getElementById('castle-canvas');
         const castleCtx = castleCanvas.getContext('2d', { alpha: false });
@@ -1250,7 +1250,7 @@
         }
 
         function logToSpreadsheet(quizResult, finalHouse) {
-            if (!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) return;
+            if (!SCRIPT_URL) return;
 
             const payload = {
                 name: candidateName,
