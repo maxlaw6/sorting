@@ -616,6 +616,118 @@
             90% { opacity: 0.9; }
             100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
+
+        /* ORACLE MODAL OVERLAY STYLING */
+        .oracle-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: rgba(3, 5, 10, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .oracle-modal-card {
+            background: linear-gradient(145deg, rgba(20, 25, 45, 0.95), rgba(8, 12, 22, 0.98));
+            border: 2px solid #d97706;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(217, 119, 6, 0.3);
+            animation: oraclePopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        @keyframes oraclePopIn {
+            from { opacity: 0; transform: scale(0.8) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .oracle-modal-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .oracle-modal-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            color: #fbbf24;
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+        }
+
+        .oracle-question {
+            font-size: 1.1rem;
+            color: #f3f4f6;
+            margin: 10px 0 18px 0;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .oracle-warning {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .oracle-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-oracle-accept {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .btn-oracle-accept:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-oracle-defy {
+            background: linear-gradient(135deg, #ef4444, #991b1b);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            flex: 1;
+        }
+
+        .btn-oracle-defy:hover {
+            background: linear-gradient(135deg, #f87171, #b91c1c);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -665,7 +777,7 @@
             <div class="house-traits-grid" id="house-traits-container"></div>
             <p class="house-description" id="house-desc-display"></p>
             
-            <!-- Manual Override Selector with Confirm Button -->
+            <!-- Manual Override Selector -->
             <div class="manual-picker-section" id="manual-picker-area">
                 <label for="manual-house-select" style="font-family:'Cinzel', serif; font-weight:700; font-size:0.9rem; color:#fbbf24;">Prefer a different house? Pick manually:</label>
                 <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
@@ -678,9 +790,9 @@
                         <option value="Protos">Protos (Turquoise)</option>
                         <option value="Nukumori">Nukumori (Purple)</option>
                     </select>
-                    <button class="action-btn" onclick="confirmManualOverride()" style="margin-top:0; padding: 12px 20px; font-size: 0.9rem; width: auto;">Confirm House</button>
+                    <button class="action-btn" onclick="handleManualOverrideClick()" style="margin-top:0; padding: 12px 20px; font-size: 0.9rem; width: auto;">Confirm House</button>
                 </div>
-                <div id="save-status" style="font-size: 0.8rem; color: #10b981; margin-top: 8px; font-weight: 600; text-align: center; display: none;">✓ House updated & saved to spreadsheet!</div>
+                <div id="save-status" style="font-size: 0.85rem; color: #10b981; margin-top: 10px; font-weight: 600; text-align: center; display: none;">✓ House updated & saved to spreadsheet!</div>
             </div>
 
             <div class="result-btn-group">
@@ -689,10 +801,27 @@
         </div>
     </div>
 
+    <!-- ORACLE CONFIRMATION MODAL -->
+    <div id="oracle-modal" class="oracle-modal-overlay" style="display: none;">
+        <div class="oracle-modal-card">
+            <img id="oracle-img" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="The Oracle" />
+            <h2>The Oracle has spoken.</h2>
+            <p class="oracle-question">Are you absolutely certain you wish to defy the prophecy?</p>
+            <div class="oracle-warning">
+                <strong>Warning:</strong> Altering your prescribed destiny may result in unknown consequences.
+            </div>
+            <div class="oracle-actions">
+                <button class="btn-oracle-accept" onclick="acceptProphecy()">Accept Prophecy</button>
+                <button class="btn-oracle-defy" onclick="defyDestiny()">Defy Destiny</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Google Apps Script Web App Endpoint linked for spreadsheet logging
+        // Google Apps Script Endpoint URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMhLExbNom1vsp616rFMwhLON1xTjSmlKu-htotPQTBTqQQOudN-Fd3gSriEN68HxKGg/exec";
 
+        // CANVAS BACKGROUND ANIMATION
         const castleCanvas = document.getElementById('castle-canvas');
         const castleCtx = castleCanvas.getContext('2d', { alpha: false });
 
@@ -797,6 +926,7 @@
         }
         drawCastleWall();
 
+        // 3D CARD TILT
         const quizCard = document.getElementById('quiz-card');
         function handleTilt(clientX, clientY) {
             const xAxis = (window.innerWidth / 2 - clientX) / 50;
@@ -815,6 +945,7 @@
         });
         window.addEventListener('mouseenter', () => { quizCard.style.transition = 'none'; });
 
+        // HOUSE DATA
         const housesData = {
             "Reveur": {
                 name: "Rêveur", letter: "R", cssClass: "reveur",
@@ -848,6 +979,7 @@
             }
         };
 
+        // QUIZ QUESTIONS
         const quizQuestions = [
             {
                 id: 1, title: "1. CHOOSE A COLOR.",
@@ -920,6 +1052,7 @@
         let userAnswers = {};
         let calculatedHouse = "";
         let finalChosenHouse = "";
+        let pendingManualHouse = "";
         let lyricRainInterval = null;
 
         const nameScreen = document.getElementById('name-screen');
@@ -931,6 +1064,7 @@
         const nextBtn = document.getElementById('next-btn');
         const prevBtn = document.getElementById('prev-btn');
         const tsSpeechToast = document.getElementById('tsSpeechToast');
+        const oracleModal = document.getElementById('oracle-modal');
 
         function startQuiz() {
             const nameInput = document.getElementById('candidate-name');
@@ -1178,7 +1312,8 @@
             document.getElementById('manual-house-select').value = houseKey;
         }
 
-        function confirmManualOverride() {
+        // ORACLE OVERRIDE WORKFLOW
+        function handleManualOverrideClick() {
             const selectElem = document.getElementById('manual-house-select');
             const selectedHouse = selectElem.value;
             
@@ -1186,8 +1321,32 @@
                 alert("Please select a house from the dropdown first!");
                 return;
             }
-            
-            finalChosenHouse = selectedHouse;
+
+            // If user selects something different than calculated house, trigger Oracle Modal
+            if (selectedHouse !== calculatedHouse) {
+                pendingManualHouse = selectedHouse;
+                oracleModal.style.display = 'flex';
+            } else {
+                // Samesies - save directly without warning
+                finalChosenHouse = calculatedHouse;
+                executeSaveAndUpdate();
+            }
+        }
+
+        function acceptProphecy() {
+            // Cancel manual change and revert to calculated house
+            oracleModal.style.display = 'none';
+            document.getElementById('manual-house-select').value = calculatedHouse;
+        }
+
+        function defyDestiny() {
+            // Confirm manual change
+            oracleModal.style.display = 'none';
+            finalChosenHouse = pendingManualHouse;
+            executeSaveAndUpdate();
+        }
+
+        function executeSaveAndUpdate() {
             renderHouseResult(finalChosenHouse);
             document.getElementById('finalCrest').classList.add('visible');
             
