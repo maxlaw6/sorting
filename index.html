@@ -89,10 +89,11 @@
             position: absolute;
             top: -2px; left: -2px; right: -2px; bottom: -2px;
             background: linear-gradient(45deg, #f59e0b, transparent, #3b82f6, transparent, #10b981, transparent, #a855f7);
-            background-size: 400% 400%;
+            background-size: 300% 300%;
             border-radius: 30px;
             z-index: -1;
-            animation: glowingBorder 12s ease infinite;
+            /* Smooth ease-in-out ping pong to prevent harsh background jumps */
+            animation: glowingBorder 15s ease-in-out infinite; 
             opacity: 0.75;
         }
 
@@ -404,6 +405,15 @@
             transform-style: preserve-3d;
             animation: modernFloat 4s ease-in-out infinite alternate;
             filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.8));
+            flex-shrink: 0; /* Prevents squishing on mobile */
+        }
+
+        @media(max-width: 768px) {
+            .shield-3d-scene {
+                width: 130px; /* Forced minimum sizes to ensure visibility */
+                height: 156px;
+            }
+            .shield-letter { font-size: 75px !important; }
         }
 
         @keyframes modernFloat {
@@ -692,31 +702,35 @@
             to { transform: scale(1.03); box-shadow: 0 0 30px rgba(236, 72, 153, 0.9); }
         }
 
+        /* Fully Fixed Mobile Toast CSS */
         .ts-speech-toast {
             position: fixed;
-            bottom: -150px;
+            bottom: 30px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(200px); /* Strictly off screen initially */
             background: linear-gradient(135deg, #ffffff, #f3f4f6);
             color: #1e293b;
-            padding: 24px 38px;
-            border-radius: 20px 20px 0 0;
+            padding: 20px 30px;
+            border-radius: 20px;
             font-family: 'Cinzel', serif;
             font-weight: 800;
-            font-size: 1.2rem;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.7), 0 0 30px rgba(236, 72, 153, 0.5);
+            font-size: 1.1rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 30px rgba(236, 72, 153, 0.5);
             border: 3px solid #ec4899;
-            border-bottom: none;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 1px;
             z-index: 2000;
-            pointer-events: none;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none; /* Prevents blocking clicks */
+            visibility: hidden; /* Guarantees it doesn't overlay anything randomly */
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s, visibility 0.4s;
         }
 
         .ts-speech-toast.show {
-            transform: translateX(-50%) translateY(-150px);
+            transform: translateX(-50%) translateY(0);
+            visibility: visible;
+            opacity: 1;
         }
 
         .lyric-particle {
@@ -788,7 +802,7 @@
             <div class="house-traits-grid" id="house-traits-container"></div>
             <p class="house-description" id="house-desc-display"></p>
             
-            <!-- Dynamic Choice Actions (Unlocked state) -->
+            <!-- Dynamic Choice Actions -->
             <div class="decision-choice-box" id="unlocked-decision-area">
                 <button class="action-btn btn-green" onclick="lockInDestinyDirectly()">
                     ✓ Accept Your Destiny
@@ -798,7 +812,7 @@
                 </button>
             </div>
 
-            <!-- Locked Status Banner (When sorting is finalized) -->
+            <!-- Locked Status Banner -->
             <div id="locked-status-area" style="display: none;">
                 <div class="locked-banner">
                     🔒 Destiny Finalized & Saved to Registry!
@@ -820,7 +834,7 @@
                 <button class="btn-oracle-defy" onclick="showOracleManualPicker()">Defy Destiny</button>
             </div>
 
-            <!-- Manual House Selector (Revealed on 'Defy Destiny') -->
+            <!-- Manual House Selector -->
             <div class="oracle-manual-select-area" id="oracle-picker-box" style="display: none;">
                 <label for="manual-house-select" style="font-family:'Cinzel', serif; font-weight:700; font-size:1rem; color:#fbbf24; display:block; margin-bottom:12px;">
                     Select the House You Wish to Claim:
@@ -847,7 +861,7 @@
         // Google Apps Script Endpoint URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMhLExbNom1vsp616rFMwhLON1xTjSmlKu-htotPQTBTqQQOudN-Fd3gSriEN68HxKGg/exec";
 
-        // CANVAS BACKGROUND ANIMATION (BRIGHTENED FOR LIT ROOMS)
+        // CANVAS BACKGROUND ANIMATION 
         const castleCanvas = document.getElementById('castle-canvas');
         const castleCtx = castleCanvas.getContext('2d', { alpha: false });
 
@@ -876,11 +890,10 @@
         const doubleBrickHeight = brickHeight * 2;
 
         function drawCastleWall() {
-            // Brightened Canvas Slate Gradient Palette
             const bgGrad = castleCtx.createLinearGradient(0, 0, 0, castleCanvas.height);
-            bgGrad.addColorStop(0, '#0f172a');   // Bright slate navy top
-            bgGrad.addColorStop(0.5, '#1e293b'); // Vibrant slate middle
-            bgGrad.addColorStop(1, '#2a3850');   // Rich lighter slate bottom
+            bgGrad.addColorStop(0, '#0f172a');   
+            bgGrad.addColorStop(0.5, '#1e293b'); 
+            bgGrad.addColorStop(1, '#2a3850');   
             castleCtx.fillStyle = bgGrad;
             castleCtx.fillRect(0, 0, castleCanvas.width, castleCanvas.height);
 
@@ -891,7 +904,6 @@
 
             castleCtx.lineWidth = 2;
 
-            // Draw Bricks with higher visibility contrast
             for (let y = -doubleBrickHeight; y < castleCanvas.height + doubleBrickHeight; y += brickHeight) {
                 const drawY = Math.floor(y + wallScrollY);
                 const rowIndex = Math.floor((y + doubleBrickHeight * 10) / brickHeight); 
@@ -901,7 +913,6 @@
                     const drawX = Math.floor(x + offset);
                     const isDarkBrick = (rowIndex + Math.floor(drawX / brickWidth)) % 3 === 0;
                     
-                    // Lightened Brick Textures
                     castleCtx.fillStyle = isDarkBrick ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.2)';
                     castleCtx.fillRect(drawX + 1, drawY + 1, brickWidth - 2, brickHeight - 2);
 
@@ -917,11 +928,9 @@
                 }
             }
 
-            // Amplified Torchlight Ambient Lighting
             const time = Date.now() * 0.0015;
             const flicker = Math.sin(time * 5) * 0.04 + Math.cos(time * 3) * 0.04;
             
-            // Left Glow - Expanded radius & higher opacity
             const leftGrad = castleCtx.createRadialGradient(100, castleCanvas.height * 0.35, 10, 100, castleCanvas.height * 0.35, 650);
             leftGrad.addColorStop(0, `rgba(245, 158, 11, ${0.35 + flicker})`);
             leftGrad.addColorStop(0.5, `rgba(217, 119, 6, 0.12)`);
@@ -929,7 +938,6 @@
             castleCtx.fillStyle = leftGrad;
             castleCtx.fillRect(0, 0, castleCanvas.width, castleCanvas.height);
 
-            // Right Glow - Expanded radius & higher opacity
             const rightGrad = castleCtx.createRadialGradient(castleCanvas.width - 100, castleCanvas.height * 0.65, 10, castleCanvas.width - 100, castleCanvas.height * 0.65, 650);
             rightGrad.addColorStop(0, `rgba(245, 158, 11, ${0.35 - flicker})`);
             rightGrad.addColorStop(0.5, `rgba(217, 119, 6, 0.12)`);
@@ -937,15 +945,17 @@
             castleCtx.fillStyle = rightGrad;
             castleCtx.fillRect(0, 0, castleCanvas.width, castleCanvas.height);
 
-            // Ambient Gold Sparkles
             castleCtx.fillStyle = '#fbbf24';
             magicalParticles.forEach(p => {
                 p.y -= p.speedY;
                 p.x += p.speedX + Math.sin(p.y * 0.02) * 0.3;
-                if (p.y < 0) {
-                    p.y = castleCanvas.height + 10;
+                
+                // Fixed Jump: wait until completely off-screen to reset
+                if (p.y < -20) {
+                    p.y = castleCanvas.height + 20;
                     p.x = Math.random() * castleCanvas.width;
                 }
+                
                 castleCtx.save();
                 castleCtx.globalAlpha = p.alpha;
                 castleCtx.shadowBlur = 10;
@@ -1371,6 +1381,34 @@
 
         function showOracleManualPicker() {
             document.getElementById('oracle-picker-box').style.display = 'block';
+
+            // Fixed: Identify the original quiz result, label it, and disable it
+            const selectElem = document.getElementById('manual-house-select');
+            
+            // Base labels so we don't accidentally stack text if they open/close it multiple times
+            const baseLabels = {
+                "Reveur": "Rêveur (Blue)",
+                "Amistad": "Amistad (Red)",
+                "Isibindi": "Isibindi (Green)",
+                "Altruismo": "Altruismo (Black & Silver)",
+                "Protos": "Protos (Turquoise)",
+                "Nukumori": "Nukumori (Purple)"
+            };
+
+            for (let i = 0; i < selectElem.options.length; i++) {
+                let opt = selectElem.options[i];
+                if (opt.value && baseLabels[opt.value]) {
+                    if (opt.value === calculatedHouse) {
+                        opt.text = `${baseLabels[opt.value]} ❌ (Quiz Result - Do Not Pick)`;
+                        opt.disabled = true; // Grays it out / prevents selection
+                        opt.style.color = "#ef4444"; 
+                    } else {
+                        opt.text = baseLabels[opt.value];
+                        opt.disabled = false;
+                        opt.style.color = "#ffffff";
+                    }
+                }
+            }
         }
 
         function confirmManualHouseSelection() {
