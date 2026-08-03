@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wallace Stegner Academy House Sorting Ceremony</title>
-    <!-- Google Fonts for Modern Styling -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -36,7 +35,6 @@
             touch-action: manipulation;
         }
 
-        /* 3D Scrolling Castle Wall Background using Canvas */
         #castle-canvas {
             position: fixed;
             top: 0;
@@ -47,7 +45,6 @@
             pointer-events: none;
         }
 
-        /* RCA Style Top Banner Bar */
         .rca-top-bar {
             position: fixed;
             top: 0;
@@ -58,7 +55,6 @@
             z-index: 1000;
         }
 
-        /* Main Quiz Wrapper with Enhanced 3D Glassmorphism, Animated Glow & Depth Layers */
         .quiz-wrapper {
             position: relative;
             z-index: 10;
@@ -87,7 +83,6 @@
             }
         }
 
-        /* Animated Magical Border */
         .quiz-wrapper::before {
             content: '';
             position: absolute;
@@ -122,25 +117,6 @@
             position: relative;
         }
 
-        .quiz-header::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 80px;
-            background: radial-gradient(ellipse at center, rgba(217, 119, 6, 0.25) 0%, transparent 70%);
-            z-index: -1;
-            pointer-events: none;
-            animation: pulseHeader 4s infinite alternate;
-        }
-
-        @keyframes pulseHeader {
-            from { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
-            to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-        }
-
         .quiz-header h1 {
             font-size: 2.4rem;
             margin: 0 0 10px 0;
@@ -151,9 +127,7 @@
         }
 
         @media(max-width: 768px) {
-            .quiz-header h1 {
-                font-size: 1.8rem;
-            }
+            .quiz-header h1 { font-size: 1.8rem; }
         }
 
         .quiz-header p {
@@ -165,7 +139,6 @@
             font-weight: 800;
         }
 
-        /* Progress Bar */
         .progress-bar-container {
             width: 100%;
             height: 8px;
@@ -238,9 +211,7 @@
         }
 
         @media(max-width: 768px) {
-            .question-text {
-                font-size: 1.1rem;
-            }
+            .question-text { font-size: 1.1rem; }
         }
 
         .options-grid {
@@ -251,9 +222,7 @@
         }
 
         @media(max-width: 600px) {
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
+            .options-grid { grid-template-columns: 1fr; }
         }
 
         .option-label {
@@ -375,7 +344,6 @@
             border-color: #fff;
         }
 
-        /* Results Screen & Modern 3D Rendered Shield Styling */
         #result-screen {
             display: none;
             text-align: center;
@@ -400,12 +368,9 @@
         }
 
         @media(max-width: 768px) {
-            .house-title {
-                font-size: 2.2rem;
-            }
+            .house-title { font-size: 2.2rem; }
         }
 
-        /* 3D Modern Clean Shield Container with Interactive Floating Motion */
         .crest-wrapper {
             display: flex;
             flex-direction: column;
@@ -440,8 +405,7 @@
             width: 100%;
             height: 100%;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -517,7 +481,6 @@
             transform: rotate(12deg);
         }
 
-        /* House Gradient Color Schemes */
         .altruismo { background: linear-gradient(145deg, #334155, #0f172a); }
         .amistad { background: linear-gradient(145deg, #ef4444, #7f1d1d); }
         .isibindi { background: linear-gradient(145deg, #10b981, #064e3b); }
@@ -560,27 +523,12 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Manual Override Picker Section */
         .manual-picker-section {
             margin: 20px 0;
             padding: 18px;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 16px;
             border: 1px dashed rgba(255, 255, 255, 0.2);
-        }
-
-        .manual-picker-section select {
-            width: 100%;
-            background: rgba(5, 7, 12, 0.9);
-            border: 1px solid #d97706;
-            border-radius: 12px;
-            padding: 12px;
-            color: #fff;
-            font-family: 'Cinzel', serif;
-            font-size: 1rem;
-            margin-top: 10px;
-            outline: none;
-            cursor: pointer;
         }
 
         .result-btn-group {
@@ -591,7 +539,6 @@
             flex-wrap: wrap;
         }
 
-        /* Taylor Swift Fanfare Easter Egg Banner */
         .ts-easter-egg {
             background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
             color: #fff;
@@ -611,7 +558,6 @@
             to { transform: scale(1.03); box-shadow: 0 0 30px rgba(236, 72, 153, 0.9); }
         }
 
-        /* Non-blocking Speech Bubble that Slides in from Bottom */
         .ts-speech-toast {
             position: fixed;
             bottom: -150px;
@@ -650,7 +596,6 @@
             }
         }
 
-        /* Falling Iconic Lyrics (Behind Sorting Window, z-index: 2) */
         .lyric-particle {
             position: fixed;
             z-index: 2;
@@ -675,13 +620,9 @@
 </head>
 <body>
 
-    <!-- 3D Scrolling Castle Wall Background Canvas -->
     <canvas id="castle-canvas"></canvas>
-
-    <!-- RCA Top Accent Bar -->
     <div class="rca-top-bar"></div>
 
-    <!-- Non-blocking Speech Bubble Toast that Slides in from Bottom -->
     <div class="ts-speech-toast" id="tsSpeechToast">
         ✨ Welcome to the best house! Are you ready for it? ✨
     </div>
@@ -716,10 +657,7 @@
         <div id="result-screen">
             <div class="welcome-candidate" id="result-candidate-name"></div>
             
-            <!-- Protos Easter Egg Banner Area -->
             <div id="easter-egg-container"></div>
-
-            <!-- Modern 3D Rendered Shield Crest Display -->
             <div id="crest-display-container"></div>
 
             <div class="welcome-candidate" style="margin-top: 10px;">Welcome to your new home at Wallace Stegner Academy</div>
@@ -727,18 +665,22 @@
             <div class="house-traits-grid" id="house-traits-container"></div>
             <p class="house-description" id="house-desc-display"></p>
             
-            <!-- Manual Override Selector -->
+            <!-- Manual Override Selector with Confirm Button -->
             <div class="manual-picker-section" id="manual-picker-area">
                 <label for="manual-house-select" style="font-family:'Cinzel', serif; font-weight:700; font-size:0.9rem; color:#fbbf24;">Prefer a different house? Pick manually:</label>
-                <select id="manual-house-select" onchange="overrideHouse(this.value)">
-                    <option value="">-- Choose House Manually --</option>
-                    <option value="Reveur">Rêveur (Blue)</option>
-                    <option value="Amistad">Amistad (Red)</option>
-                    <option value="Isibindi">Isibindi (Green)</option>
-                    <option value="Altruismo">Altruismo (Black & Silver)</option>
-                    <option value="Protos">Protos (Turquoise)</option>
-                    <option value="Nukumori">Nukumori (Purple)</option>
-                </select>
+                <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                    <select id="manual-house-select" style="flex: 1; min-width: 180px; background: rgba(5, 7, 12, 0.9); border: 1px solid #d97706; border-radius: 12px; padding: 12px; color: #fff; font-family: 'Cinzel', serif; font-size: 1rem; outline: none; cursor: pointer;">
+                        <option value="">-- Choose House Manually --</option>
+                        <option value="Reveur">Rêveur (Blue)</option>
+                        <option value="Amistad">Amistad (Red)</option>
+                        <option value="Isibindi">Isibindi (Green)</option>
+                        <option value="Altruismo">Altruismo (Black & Silver)</option>
+                        <option value="Protos">Protos (Turquoise)</option>
+                        <option value="Nukumori">Nukumori (Purple)</option>
+                    </select>
+                    <button class="action-btn" onclick="confirmManualOverride()" style="margin-top:0; padding: 12px 20px; font-size: 0.9rem; width: auto;">Confirm House</button>
+                </div>
+                <div id="save-status" style="font-size: 0.8rem; color: #10b981; margin-top: 8px; font-weight: 600; text-align: center; display: none;">✓ House updated & saved to spreadsheet!</div>
             </div>
 
             <div class="result-btn-group">
@@ -855,9 +797,7 @@
         }
         drawCastleWall();
 
-        // 3D Tilt Effect on Quiz Card
         const quizCard = document.getElementById('quiz-card');
-        
         function handleTilt(clientX, clientY) {
             const xAxis = (window.innerWidth / 2 - clientX) / 50;
             const yAxis = (window.innerHeight / 2 - clientY) / 50;
@@ -1185,7 +1125,6 @@
                 document.getElementById('finalCrest').classList.add('visible');
             }, 100);
 
-            // Log initial result to spreadsheet
             logToSpreadsheet(calculatedHouse, finalChosenHouse);
         }
 
@@ -1239,22 +1178,34 @@
             document.getElementById('manual-house-select').value = houseKey;
         }
 
-        function overrideHouse(selectedHouse) {
-            if(!selectedHouse) return;
+        function confirmManualOverride() {
+            const selectElem = document.getElementById('manual-house-select');
+            const selectedHouse = selectElem.value;
+            
+            if(!selectedHouse) {
+                alert("Please select a house from the dropdown first!");
+                return;
+            }
+            
             finalChosenHouse = selectedHouse;
             renderHouseResult(finalChosenHouse);
             document.getElementById('finalCrest').classList.add('visible');
             
-            // Log manual override update to spreadsheet
             logToSpreadsheet(calculatedHouse, finalChosenHouse);
+            
+            const statusDiv = document.getElementById('save-status');
+            statusDiv.style.display = 'block';
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
         }
 
-        function logToSpreadsheet(quizResult, finalHouse) {
+        function logToSpreadsheet(calcHouse, finalHouse) {
             if (!SCRIPT_URL) return;
 
             const payload = {
                 name: candidateName,
-                calculatedHouse: quizResult,
+                calculatedHouse: calcHouse,
                 finalHouse: finalHouse,
                 timestamp: new Date().toLocaleString()
             };
