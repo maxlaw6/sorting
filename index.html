@@ -560,6 +560,37 @@
             border: 1px solid rgba(255,255,255,0.05);
         }
 
+        /* Manual Override Picker Section */
+        .manual-picker-section {
+            margin: 20px 0;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .manual-picker-section select {
+            width: 100%;
+            background: rgba(5, 7, 12, 0.9);
+            border: 1px solid #d97706;
+            border-radius: 12px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            margin-top: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .result-btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
         /* Taylor Swift Fanfare Easter Egg Banner */
         .ts-easter-egg {
             background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
@@ -695,11 +726,31 @@
             <div class="house-title" id="house-name-display"></div>
             <div class="house-traits-grid" id="house-traits-container"></div>
             <p class="house-description" id="house-desc-display"></p>
-            <button class="action-btn" id="result-action-btn" onclick="location.reload()">Retake Sorting</button>
+            
+            <!-- NEW: Manual Override Selector -->
+            <div class="manual-picker-section" id="manual-picker-area">
+                <label for="manual-house-select" style="font-family:'Cinzel', serif; font-weight:700; font-size:0.9rem; color:#fbbf24;">Prefer a different house? Pick manually:</label>
+                <select id="manual-house-select" onchange="overrideHouse(this.value)">
+                    <option value="">-- Choose House Manually --</option>
+                    <option value="Reveur">Rêveur (Blue)</option>
+                    <option value="Amistad">Amistad (Red)</option>
+                    <option value="Isibindi">Isibindi (Green)</option>
+                    <option value="Altruismo">Altruismo (Black & Silver)</option>
+                    <option value="Protos">Protos (Turquoise)</option>
+                    <option value="Nukumori">Nukumori (Purple)</option>
+                </select>
+            </div>
+
+            <div class="result-btn-group">
+                <button class="action-btn" onclick="location.reload()">Retake Sorting</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // REPLACE THIS URL with your deployed Google Apps Script Web App URL once configured
+        const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_URL_HERE";
+
         const castleCanvas = document.getElementById('castle-canvas');
         const castleCtx = castleCanvas.getContext('2d', { alpha: false });
 
@@ -927,6 +978,8 @@
         let currentStep = 0;
         let candidateName = "";
         let userAnswers = {};
+        let calculatedHouse = "";
+        let finalChosenHouse = "";
         let lyricRainInterval = null;
 
         const nameScreen = document.getElementById('name-screen');
@@ -1064,7 +1117,7 @@
                 lyricEl.innerText = iconicLyrics[Math.floor(Math.random() * iconicLyrics.length)];
                 
                 const randomX = Math.random() * (window.innerWidth - 200);
-                const duration = Math.random() * 4 + 5; // 5 to 9 seconds
+                const duration = Math.random() * 4 + 5;
                 
                 lyricEl.style.left = `${randomX}px`;
                 lyricEl.style.top = `-50px`;
@@ -1086,10 +1139,6 @@
                 }
             });
 
-            // TIEBREAKER LOGIC:
-            // Tiebreaker 1: Color (Question 1)
-            // Tiebreaker 2: Travel (Question 3)
-            // Tiebreaker 3: How others describe you (Question 6)
             let maxScore = -1;
             let tiedHouses = [];
 
@@ -1102,33 +1151,46 @@
                 }
             }
 
-            let winningHouse;
             if (tiedHouses.length > 1) {
                 const q1Choice = userAnswers[1];
                 if (q1Choice && tiedHouses.includes(q1Choice)) {
-                    winningHouse = q1Choice;
+                    calculatedHouse = q1Choice;
                 } else {
                     const q3Choice = userAnswers[3];
                     if (q3Choice && tiedHouses.includes(q3Choice)) {
-                        winningHouse = q3Choice;
+                        calculatedHouse = q3Choice;
                     } else {
                         const q6Choice = userAnswers[6];
                         if (q6Choice && tiedHouses.includes(q6Choice)) {
-                            winningHouse = q6Choice;
+                            calculatedHouse = q6Choice;
                         } else {
-                            winningHouse = tiedHouses[Math.floor(Math.random() * tiedHouses.length)];
+                            calculatedHouse = tiedHouses[Math.floor(Math.random() * tiedHouses.length)];
                         }
                     }
                 }
             } else {
-                winningHouse = tiedHouses[0];
+                calculatedHouse = tiedHouses[0];
             }
 
-            const houseInfo = housesData[winningHouse];
+            finalChosenHouse = calculatedHouse;
 
             progressContainer.style.display = 'none';
             quizForm.style.display = 'none';
             navButtons.style.display = 'none';
+
+            renderHouseResult(finalChosenHouse);
+            resultScreen.style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('finalCrest').classList.add('visible');
+            }, 100);
+
+            // Log initial result to spreadsheet
+            logToSpreadsheet(calculatedHouse, finalChosenHouse);
+        }
+
+        function renderHouseResult(houseKey) {
+            const houseInfo = housesData[houseKey];
 
             document.getElementById('result-candidate-name').innerText = `Candidate: ${candidateName}`;
             document.getElementById('house-name-display').innerText = houseInfo.name;
@@ -1145,10 +1207,9 @@
                 traitsContainer.appendChild(badge);
             });
 
-            // Handle Protos Fanfare / Taylor Swift Easter Egg
             const easterEggContainer = document.getElementById('easter-egg-container');
             easterEggContainer.innerHTML = '';
-            if (winningHouse === "Protos") {
+            if (houseKey === "Protos") {
                 triggerProtosFireworks();
                 easterEggContainer.innerHTML = `
                     <div class="ts-easter-egg">
@@ -1159,6 +1220,9 @@
                     tsSpeechToast.classList.add('show');
                     startLyricRain();
                 }, 600);
+            } else {
+                tsSpeechToast.classList.remove('show');
+                if(lyricRainInterval) clearInterval(lyricRainInterval);
             }
 
             const crestDisplayContainer = document.getElementById('crest-display-container');
@@ -1172,12 +1236,35 @@
                     <div class="banner">${houseInfo.name}</div>
                 </div>
             `;
+            document.getElementById('manual-house-select').value = houseKey;
+        }
 
-            resultScreen.style.display = 'block';
+        function overrideHouse(selectedHouse) {
+            if(!selectedHouse) return;
+            finalChosenHouse = selectedHouse;
+            renderHouseResult(finalChosenHouse);
+            document.getElementById('finalCrest').classList.add('visible');
+            
+            // Log manual override update to spreadsheet
+            logToSpreadsheet(calculatedHouse, finalChosenHouse);
+        }
 
-            setTimeout(() => {
-                document.getElementById('finalCrest').classList.add('visible');
-            }, 100);
+        function logToSpreadsheet(quizResult, finalHouse) {
+            if (!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) return;
+
+            const payload = {
+                name: candidateName,
+                calculatedHouse: quizResult,
+                finalHouse: finalHouse,
+                timestamp: new Date().toLocaleString()
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log("Logging error:", err));
         }
     </script>
 </body>
