@@ -1461,11 +1461,20 @@
         function logToSpreadsheet(calcHouse, finalHouse) {
             if (!SCRIPT_URL) return;
 
+            // Include all 8 question answers in the payload
             const payload = {
                 name: candidateName,
                 calculatedHouse: calcHouse,
                 finalHouse: finalHouse,
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString(),
+                q1: userAnswers[1] || "",
+                q2: userAnswers[2] || "",
+                q3: userAnswers[3] || "",
+                q4: userAnswers[4] || "",
+                q5: userAnswers[5] || "",
+                q6: userAnswers[6] || "",
+                q7: userAnswers[7] || "",
+                q8: userAnswers[8] || ""
             };
 
             fetch(SCRIPT_URL, {
