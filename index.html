@@ -732,6 +732,17 @@
             visibility: visible;
             opacity: 1;
         }
+        
+        @media (max-width: 768px) {
+            .ts-speech-toast {
+                bottom: auto; /* Removes the bottom anchor */
+                top: 25px; /* Drops it down from the top instead */
+                transform: translateX(-50%) translateY(-200px); /* Starts off-screen top */
+                width: 90%; /* Prevents it from hitting screen edges */
+                padding: 15px; /* Slightly smaller padding */
+                font-size: 0.95rem; /* Slightly smaller text for mobile */
+            }
+        }
 
         .lyric-particle {
             position: fixed;
